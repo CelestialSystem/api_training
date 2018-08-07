@@ -8,6 +8,7 @@ module.exports = function (router, dataConfig) {
             res.send({ data: result, status: 200, message: 'success' })
         })
     });
+    
     router.route('/getUsers').get(function (req, res, next) {
 
     });
