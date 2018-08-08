@@ -23,6 +23,14 @@ module.exports = function (knex) {
                 console.log("returned err ", err)
                 next("", err)
             })
+        },
+        createValidUser: function (user_data, next) {
+            knex.knex('user_data').insert({ id:3, user_name: user_data.userName, email: user_data.email, password: user_data.password }).then((res) => {
+                next(res, null)
+            }).catch((err) => {
+                console.log("returned err ", err)
+                next("", err)
+            })
         }
     }
 }

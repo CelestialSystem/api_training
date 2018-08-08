@@ -1,5 +1,9 @@
 <div>
     <label>Username:</label>
+    <input id="user_name" type="text" name="User name" />
+</div>
+<div>
+    <label>Email:</label>
     <input id="email" type="email" name="email" />
 </div>
 <div>
@@ -10,7 +14,7 @@
     <input type="button" value="Log In"  onclick="loginUser()"/>
 </div>
 <div>
-    <a href="/register" value="Sign Up" /></a>
+    <input type="button" value="Sign Up"  onclick="signUpUser()"/>
 </div>
 <script>
     
@@ -21,6 +25,13 @@ function loginUser() {
     console.log("password: ",password)
 
     requestfunc('http://localhost:8082/auth/login',{email: email, password: password})
+}   
+function signUpUser() {
+    let email = document.getElementById('email').value;
+    let userName = document.getElementById('user_name').value;
+    console.log("email: ",email)
+
+    requestfunc('http://localhost:8082/auth/signup/verify',{email: email, userName: userName})
 }
 function requestfunc(path, data){
     

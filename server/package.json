@@ -31,10 +31,12 @@
     "jwt-simple": "^0.5.1",
     "knex": "^0.15.2",
     "knex-migrate": "^1.6.1",
+    "nodemailer": "^4.6.7",
     "nodemon": "^1.18.3",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "password-generator": "^2.2.0",
     "pg": "^7.4.3",
     "server-static": "^2.0.5",
     "sqlite3": "^4.0.2"
