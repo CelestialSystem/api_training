@@ -1,6 +1,5 @@
 module.exports = function (router, dataConfig) {
     router.route('/').get(function (req, res) {
-        console.log("inside users route");
         dataConfig.getAllUsers(req, res, function (result, err) {
             if (err) {
                 return next(err);
