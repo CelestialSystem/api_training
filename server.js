@@ -11,10 +11,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const userController = require('./apis/users/users_controller.js');
-const authMiddware = require('./middleware/auth.js');
 
 app.use('/user', userController);
-app.use('/auth', authMiddware);
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
