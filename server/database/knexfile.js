@@ -11,7 +11,7 @@ module.exports = {
       password: 'admin'
     },
     migrations: {
-      directory: '../migrations',
+      directory: __dirname+'/migrations',
     }
   },
 

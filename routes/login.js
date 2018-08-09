@@ -33,6 +33,12 @@ module.exports = function (router, auth) {
             return next(error);
         }
 
-    });
+    })
+    router.get('/google',auth.google_token_generation());
+    router.get('/google/callback',auth.google_authenticate(),
+        function (req, res) {
+            console.log("response in google callback: ",req.user)
+            res.redirect('/user/');
+        });
     return router;
 };

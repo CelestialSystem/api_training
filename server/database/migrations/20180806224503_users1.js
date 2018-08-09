@@ -1,6 +1,6 @@
 exports.up = function(knex, Promise) {
     return knex.schema.createTableIfNotExists('user_data', (t) => {
-        t.integer('id').primary().autoIncrement;
+        t.integer('id').autoIncrement;
         t.string('user_name');
         t.string('email');
         t.string('password');

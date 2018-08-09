@@ -16,19 +16,30 @@ module.exports = function (knex) {
                 next("", err)
             })
         },
-        checkValidUser: function (email, next) {
-            knex.knex('user_data').where({ email: email}).first().then((res) => {
+        getUserByMail: function (email, next) {
+            knex.knex('user_data').where({ email: email }).first().then((res) => {
                 next(res, null)
             }).catch((err) => {
                 console.log("returned err ", err)
                 next("", err)
             })
         },
-        createValidUser: function (user_data, next) {
-            knex.knex('user_data').insert({ id:3, user_name: user_data.userName, email: user_data.email, password: user_data.password }).then((res) => {
+        insertGoogleUser: function (user_data,token,next) {
+            knex.knex('google_users_new').insert({
+                id: 1, name: user_data.displayName, google_mail: user_data.emails[0].value, google_id: user_data.id, google_token: token,
+                created_at: Date.now()
+            }).then((res) => {
                 next(res, null)
             }).catch((err) => {
                 console.log("returned err ", err)
+                next("", err)
+            })
+        },
+        getGoogleUserById:  function (googleId, next) {
+            knex.knex('google_users_new').where({ google_id: googleId }).first().then((res) => {
+                next(res, null)
+            }).catch((err) => {
+                console.log("returned err1 ", err)
                 next("", err)
             })
         }

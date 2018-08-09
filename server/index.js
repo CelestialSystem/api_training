@@ -6,6 +6,7 @@ import jwtSimple from 'jwt-simple';
 import bCrypt from 'bcryptjs';
 import passGenerator from 'password-generator';
 import nodeMailer from 'nodemailer';
+import googleAuth from 'passport-google-oauth';
 
 import knex from './database/bookShelf';
 
@@ -18,6 +19,7 @@ import controller from '../controller/userCtrl.js';
 
 const app = server.app;
 const passportLocalStrategy = passportLocal.Strategy;
+const GoogleStrategy = googleAuth.OAuth2Strategy;
 app.use(passport.initialize());
 // app.use((req, res, next) => {
 //     let error = new Error("404 Not Found!");
@@ -33,7 +35,7 @@ app.use((error, req, res, next) => {
     });
 });
 const dataConfig = controller(knex);
-const auth = authRoute(passport, passportJwt, jwtSimple, bCrypt, dataConfig);
+const auth = authRoute(passport, passportJwt, jwtSimple, bCrypt, GoogleStrategy, dataConfig);
 app.use('/auth', login(server.routes, auth))
 app.use('/auth/signup', register(server.routes, passGenerator, nodeMailer, dataConfig))
 app.use('/user', auth.authenticate(), user(server.routes, dataConfig))

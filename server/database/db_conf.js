@@ -7,7 +7,7 @@ module.exports.development = {
         database: 'tradein_development'
     },
     migrations: {
-        directory: '../migrations'
+        directory: __dirname+'/migrations'
     },
     useNullAsDefault: true
     // seeds:{

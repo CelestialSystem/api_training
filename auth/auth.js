@@ -1,4 +1,5 @@
-module.exports = (passport, passportJwt, jwtSimple, bCrypt, dataConfig) => {
+const googleCredential = require('./googleConf');
+module.exports = (passport, passportJwt, jwtSimple, bCrypt, GoogleStrategy, dataConfig) => {
     const ExtractJwt = passportJwt.ExtractJwt;
     const Strategy = passportJwt.Strategy;
     let cfg = require('./jwt_conf');
@@ -20,11 +21,42 @@ module.exports = (passport, passportJwt, jwtSimple, bCrypt, dataConfig) => {
             }
         })
     });
+    let googleStrategy = new GoogleStrategy({
+        clientID: googleCredential.clientID,
+        clientSecret: googleCredential.clientSecret,
+        callbackURL: googleCredential.callbackURL
+    },
+        function (token, tokenSecret, profile, done) {
+            dataConfig.getGoogleUserById(profile.id, function (user, err) {
+                if (err) {
+                    return done(err, null);
+                }
+                if (!user) {
+                    dataConfig.insertGoogleUser(profile, token, function (data, err) {
+                        if (err) {
+                            return done(err, null);
+                        }
+                        return done(null, { user: data, token: token, message: 'success' })
+                    })
+                }
+                console.log("valid user data: ",user)
+                return done(null, { user: user, token: token, message: 'success' });
+            })
+            // return done(null, profile);
+        }
+    );
     passport.use(strategy);
+    passport.use(googleStrategy);
     return {
+        google_token_generation: function () {
+            return passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] })
+        },
+        google_authenticate: function () {
+            return passport.authenticate('google', { session: false });
+        },
         token_generation: function (user) {
             return new Promise((success, reject) => {
-                dataConfig.checkValidUser(user.email, function (data, err) {
+                dataConfig.getUserByMail(user.email, function (data, err) {
                     if (err) {
                         return reject(err);
                     }

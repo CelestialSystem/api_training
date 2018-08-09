@@ -8,11 +8,21 @@ module.exports = function (router, dataConfig) {
         })
     });
     
-    router.route('/getUsers').get(function (req, res, next) {
-
+    router.route('/getUsers/:email').get(function (req, res, next) {
+        dataConfig.getUserByMail(req, res, function (result, err) {
+            if (err) {
+                return next(err);
+            }
+            res.send({ data: result, status: 200, message: 'success' })
+        })
     });
     router.route('/getUsers:id').get(function (req, res, next) {
-
+        dataConfig.getUserById(req, res, function (result, err) {
+            if (err) {
+                return next(err);
+            }
+            res.send({ data: result, status: 200, message: 'success' })
+        })
     });
     router.route('/createUsers').post(function (req, res, next) {
 

@@ -10,7 +10,8 @@ module.exports = (function () {
     server.app = express();
     server.app.use(bodyParser.json());
     server.app.use(bodyParser.urlencoded({ extended: true }));
-    //  server.app.use(cors({origin: 'http://localhost:8082/'}))
+    server.app.use(cors())
+
     server.app.use('/', express.static(__dirname + '../public/login.html'));
     server.app.get('/', (req, res, next) => {
         let pathnow = path.join(__dirname, '../public/login.html');
