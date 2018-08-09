@@ -38,7 +38,7 @@ passport.use(new GoogleStrategy({
        User.forge({ googleId: profile.id }).fetch().then(function (user) {
             //check if user already exists in the database
             if(user){
-                // already have the user so update the login time only
+                // already have the user so update the login time and access token only
                 User.forge({id:user.id,googleId: user.googleId}).save({'access_token':accessToken,'loginTime':new Date()}, {patch: true}).then(function(data){
                     console.log('User already found! User Login time updated!');
                     return done(null, data); 
@@ -47,9 +47,8 @@ passport.use(new GoogleStrategy({
                 });
             }
             else{
-               // if there is no user found with that google id, create them
                 var newUser = new Object();
-    
+                            
                 // set all of the google information in our user model
                 newUser.googleId    = profile.id; // set the users google id                 
                 newUser.access_token = accessToken; // we will save the token that google provides to the user                    
@@ -57,15 +56,30 @@ passport.use(new GoogleStrategy({
                 newUser.lastName = profile.name.familyName; // look at the passport user profile to see how names are returned
                 newUser.email = profile.emails[0].value; // google can return multiple emails so we'll take the first
                 newUser.username = profile.displayName;
-                newUser.password = accessToken;
                 newUser.loginTime = new Date();
+                
+                User.forge({email:profile.emails[0].value}).fetch().then(function(u_data){
+                    if(u_data){
+                        User.forge({id:u_data.id}).save(newUser, 
+                        {patch: true}).then(function(data){
+    
+                            return done(null, data); 
+                        }).catch(function(er){
+                            return done(er);
+                        });
+                    }
+                    else{
+                        // if there is no user found with that google id, create them
 
-                // save our user to the database
-                User.forge(newUser).save().then(function(u_data) {
-                // if successful, return the new user
-                    return done(null, u_data);
-                }).catch(function(error){
-                    return done(error);
+                        User.forge(newUser).save().then(function(u_data) {
+                        // if successful, return the new user
+                            return done(null, u_data);
+                        }).catch(function(error){
+                            return done(error);
+                        });
+                    }
+                }).catch(function(er){
+
                 });
             }
             //return done(err, user);

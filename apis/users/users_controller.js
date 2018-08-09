@@ -45,6 +45,7 @@ router.post('/register', function(req, res) {
                 });
                 
                 User.forge(newUserMysql).save().then(function(data){
+                    // send system generated password mail to user who is registering himself 
                     var mailOptions = {
                         from: 'shivanitest14@gmail.com',
                         to: 'sharma.14shivani@gmail.com',
@@ -65,8 +66,7 @@ router.post('/register', function(req, res) {
                     });
                 }).catch(function(err){
                     return res.status(400).json({
-                        message: 'Error registering user!',
-                        user   : data
+                        message: 'Username already found!'
                     });
                 }); 
             }   
@@ -139,40 +139,92 @@ router.get("/secret", passport.authenticate('jwt', { session: false }), function
 
 // api to all the data of users from the database after checking the user is authenticated or not
 
-router.get("/dashboard", passport.authenticate('jwt', { session: false }), viewList);
-router.get("/adduser", passport.authenticate('jwt', { session: false }), addUserData);
-router.get("/edituser", passport.authenticate('jwt', { session: false }), editUserData);
+router.post("/adduser", passport.authenticate('jwt', { session: false }), addUserData);
+router.post("/edituser/:id", passport.authenticate('jwt', { session: false }), editUserData);
 router.get("/getuser", passport.authenticate('jwt', { session: false }), getUserData);
 
-function viewList(req,res){
-    User.fetchAll().then(function(data){
-        res.json({status: 'ok',user:data});
-    }).catch(function(error) { 
-        res.status(404).json({
-            status: 'not ok',
-            data: null
-        });
-    });
-}
 
 function addUserData(req,res){
-    User.fetchAll().then(function(data){
-        res.json({status: 'ok',user:data});
-    }).catch(function(error) { 
-        res.status(404).json({
-            status: 'not ok',
-            data: null
-        });
+    var user_data = new Object();
+    user_data.email    = req.body.email;
+    user_data.username    = req.body.username;
+    user_data.firstName    = req.body.firstName;
+    user_data.lastName    = req.body.lastName;
+    user_data.password = generator.generate({
+        length: 10,
+        numbers: true
+    });
+
+    User.forge({email:req.body.email}).fetch().then(function(rows){
+        if (rows) {
+            return res.send("User already exist in the database!");
+        } else {
+            // if there is no user with that email then add the user
+            
+            User.forge(user_data).save().then(function(data){
+                var mailOptions = {
+                    from: 'shivanitest14@gmail.com',
+                    to: 'sharma.14shivani@gmail.com',
+                    subject: 'User Password',
+                    text: 'Your email id is : '+user_data.email+ ' Your Password is : '+user_data.password
+                };
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log('Email sent: ' + info.response);
+                    }
+                });
+                return res.status(200).json({
+                    message: 'User added successfully!',
+                    user   : data,
+                    status: 'ok'
+                });
+            }).catch(function(err){
+                return res.status(400).json({
+                    message: 'Error adding user!'
+                });
+            }); 
+        }   
+    }).catch(function(err){
+        res.send(err);
     });
 }
 
 function editUserData(req,res){
-    User.fetchAll().then(function(data){
-        res.json({status: 'ok',user:data});
+    var id = req.params.id;
+
+    var user_data = new Object();
+    user_data.email    = req.body.email;
+    user_data.username    = req.body.username;
+    user_data.firstName    = req.body.firstName;
+    user_data.lastName    = req.body.lastName;
+    user_data.created_at = new Date();
+
+    User.forge({id:id}).fetch().then(function(user){
+        if(user){
+            User.forge({id:id}).save(user_data).then(function(data){
+                return res.status(200).json({
+                    message: 'User edited successfully!',
+                    user   : data,
+                    status: 'ok'
+                });
+            }).catch(function(error){
+                return res.status(400).json({
+                    message: 'Error editing user!'
+                });
+            });
+        }
+        else{
+            return res.status(400).json({
+                message: 'No user found with this id!',
+                user   : null
+            });
+        }
     }).catch(function(error) { 
         res.status(404).json({
             status: 'not ok',
-            data: null
+            message: 'Error in finding user id.'
         });
     });
 }
@@ -183,6 +235,7 @@ function getUserData(req,res){
     }).catch(function(error) { 
         res.status(404).json({
             status: 'not ok',
+            message:'No user found in the database!',
             data: null
         });
     });
