@@ -17,6 +17,10 @@ module.exports = (function () {
         let pathnow = path.join(__dirname, '../public/login.html');
         res.sendFile(pathnow)
     });
+    server.app.get('/index', (req, res, next) => {
+        let pathnow = path.join(__dirname, '../public/index.html');
+        res.sendFile(pathnow)
+    });
     server.app.listen(process.env.NODE_PORT || 8082);
     console.log("hi in server file");
     return server;
