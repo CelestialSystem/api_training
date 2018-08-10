@@ -2,7 +2,9 @@ const express = require('express');
 const app = express();
 const passport = require('passport');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 
+var PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/json' }));
@@ -18,8 +20,10 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-app.listen(3000, function () {
-    console.log('Listening on port 3000.');
+app.listen(PORT, function () {
+    console.log('Listening on port ' +PORT);
 });
+
+
 
 module.exports = app;

@@ -1,7 +1,5 @@
-const bcrypt = require('bcrypt-nodejs');
 const User = require('../apis/users/user.js');
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy,
 ExtractJwt = require('passport-jwt').ExtractJwt;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -30,13 +28,13 @@ passport.use(new JwtStrategy(jwtOptions,function(jwt_payload,done) {
 // google authentication strategy
 
 passport.use(new GoogleStrategy({
-    clientID: '792733349077-6hmut9k86hiecsb4lgpm0ehoiloiir93.apps.googleusercontent.com',
-    clientSecret: 'IzBORHvI4MIvNK3o5oFJ8IYl',
-    callbackURL: "http://localhost:3000/user/auth/google/callback"
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.CALLBACK_URL
   },
   function(accessToken, refreshToken, profile, done) {
        User.forge({ googleId: profile.id }).fetch().then(function (user) {
-            //check if user already exists in the database
+            // check if user already exists in the database
             if(user){
                 // already have the user so update the login time and access token only
                 User.forge({id:user.id,googleId: user.googleId}).save({'access_token':accessToken,'loginTime':new Date()}, {patch: true}).then(function(data){
@@ -78,11 +76,11 @@ passport.use(new GoogleStrategy({
                             return done(error);
                         });
                     }
-                }).catch(function(er){
-
+                }).catch(function(err){
+                    return done(err);
                 });
             }
-            //return done(err, user);
+            // return done(err, user);
        }).catch(function(err){
             return done(err);
        });

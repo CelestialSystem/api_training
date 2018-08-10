@@ -5,11 +5,23 @@
         "es6": true,
         "jest": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended"],
     "rules": {
         "semi": ["error", "always"],
         "no-cond-assign": ["error", "always"],
-        "no-console": "off"
+        "no-console": "off",
+        "spaced-comment": ["error", "always", {
+            "line": {
+                "markers": ["/"],
+                "exceptions": ["-", "+"]
+            },
+            "block": {
+                "markers": ["!"],
+                "exceptions": ["*"],
+                "balanced": true
+            }
+        }],
+        "no-unused-vars": "off"
     },
     "parser": "babel-eslint",
     "parserOptions": {
