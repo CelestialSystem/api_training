@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">26.83% </span>
+        <span class="strong">39.47% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>11/41</span>
+        <span class='fraction'>15/38</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">16.67% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/6</span>
+        <span class='fraction'>1/6</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">18.18% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/14</span>
+        <span class='fraction'>2/11</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">26.83% </span>
+        <span class="strong">39.47% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>11/41</span>
+        <span class='fraction'>15/38</span>
       </div>
     </div>
     <p class="quiet">
@@ -127,15 +127,7 @@
 <a name='L79'></a><a href='#L79'>79</a>
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -144,16 +136,16 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,10 +188,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -210,11 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,16 +217,16 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 var jwtOptions = new Object();
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = 'my_secret';
-&nbsp;
+console.log(jwtOptions.jwtFromRequest);
 // authentication using jwt strategy
 &nbsp;
-passport.use(new JwtStrategy(jwtOptions,<span class="fstat-no" title="function not covered" >fu</span>nction(jwt_payload,done) {
-<span class="cstat-no" title="statement not covered" >    console.log(jwt_payload);</span>
-<span class="cstat-no" title="statement not covered" >    User.forge({id: jwt_payload.id}).fetch().then(<span class="fstat-no" title="function not covered" >fu</span>nction(user) {</span>
-<span class="cstat-no" title="statement not covered" >        if(!user){</span>
+passport.use(new JwtStrategy(jwtOptions,function(jwt_payload,done) {
+    // console.log(jwt_payload);
+    User.forge({id: jwt_payload.id}).fetch().then(function(user) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(!user){
 <span class="cstat-no" title="statement not covered" >            return done(null,false,{message:"Incorrect email!"});</span>
         }
-<span class="cstat-no" title="statement not covered" >        return done(null, user.attributes, {</span>
+        return done(null, user.attributes, {
             message: 'Logged In Successfully'
         });
     }).catch(<span class="fstat-no" title="function not covered" >fu</span>nction(err){
@@ -254,9 +238,9 @@ passport.use(new JwtStrategy(jwtOptions,<span class="fstat-no" title="function n
 // google authentication strategy
 &nbsp;
 passport.use(new GoogleStrategy({
-    clientID: '792733349077-6hmut9k86hiecsb4lgpm0ehoiloiir93.apps.googleusercontent.com',
-    clientSecret: 'IzBORHvI4MIvNK3o5oFJ8IYl',
-    callbackURL: "http://localhost:3000/user/auth/google/callback"
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.CALLBACK_URL
   },
 <span class="fstat-no" title="function not covered" >  fu</span>nction(accessToken, refreshToken, profile, done) {
 <span class="cstat-no" title="statement not covered" >       User.forge({ googleId: profile.id }).fetch().then(<span class="fstat-no" title="function not covered" >fu</span>nction (user) {</span>
@@ -284,12 +268,8 @@ passport.use(new GoogleStrategy({
                 
 <span class="cstat-no" title="statement not covered" >                User.forge({email:profile.emails[0].value}).fetch().then(<span class="fstat-no" title="function not covered" >fu</span>nction(u_data){</span>
 <span class="cstat-no" title="statement not covered" >                    if(u_data){</span>
-<span class="cstat-no" title="statement not covered" >                        User.forge({id:u_data.id}).save(newUser, </span>
-                        {patch: true}).then(<span class="fstat-no" title="function not covered" >fu</span>nction(data){
-    
+<span class="cstat-no" title="statement not covered" >                        User.forge({id:u_data.id}).save(newUser,{patch: true}).then(<span class="fstat-no" title="function not covered" >fu</span>nction(data){</span>
 <span class="cstat-no" title="statement not covered" >                            return done(null, data); </span>
-                        }).catch(<span class="fstat-no" title="function not covered" >fu</span>nction(er){
-<span class="cstat-no" title="statement not covered" >                            return done(er);</span>
                         });
                     }
                     else{
@@ -298,12 +278,8 @@ passport.use(new GoogleStrategy({
 <span class="cstat-no" title="statement not covered" >                        User.forge(newUser).save().then(<span class="fstat-no" title="function not covered" >fu</span>nction(u_data) {</span>
                         // if successful, return the new user
 <span class="cstat-no" title="statement not covered" >                            return done(null, u_data);</span>
-                        }).catch(<span class="fstat-no" title="function not covered" >fu</span>nction(error){
-<span class="cstat-no" title="statement not covered" >                            return done(error);</span>
                         });
                     }
-                }).catch(<span class="fstat-no" title="function not covered" >fu</span>nction(err){
-<span class="cstat-no" title="statement not covered" >                    return done(err);</span>
                 });
             }
             // return done(err, user);
@@ -319,7 +295,7 @@ module.exports = jwtOptions.secretOrKey;</pre></td></tr>
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri Aug 10 2018 15:55:39 GMT+0530 (India Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Aug 13 2018 18:08:30 GMT+0530 (India Standard Time)
 </div>
 </div>
 <script src="..\..\prettify.js"></script>

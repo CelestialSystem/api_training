@@ -30,14 +30,12 @@ router.post('/register', function(req, res) {
     
         User.forge({email:req.body.email}).fetch().then(function(rows){
             if (rows) {
-                return res.json("User already registered!");
+                return res.json({status:"not ok", message:"User already registered!"});
             } else {
                 // if there is no user with that email then create the user
                 var newUserMysql = new Object();
-                
                 newUserMysql.email    = req.body.email;
                 newUserMysql.username    = req.body.username;
-                // newUserMysql.password = hashedPassword;
                 newUserMysql.password = generator.generate({
                     length: 10,
                     numbers: true
@@ -70,7 +68,9 @@ router.post('/register', function(req, res) {
                 }); 
             }   
         }).catch(function(er){
-            res.send(er);
+            return res.json({
+                message: er
+            });
         });
     }
 });
@@ -87,21 +87,36 @@ router.post("/login", function(req, res) {
         if(!user){
             res.status(401).json({message:"Incorrect email!"});
         }
-        bcrypt.compare(password,user.attributes.password,function(error,result){
-            if(result==false){
-                res.json({message:"password did not match ",error});
-            }
-            else{
-                var payload = {id: user.attributes.id};
-                var token = jwt.sign(payload, secret_key, { expiresIn: 60 * 60 });
+        // bcrypt.compare(password,user.attributes.password,function(error,result){
+        //     console.log(result);
+        //     if(result==false){
+        //         console.log('m here');
+        //         res.status(401).json({message:"password did not match "});
+        //     }
+        //     else{
+        //         var payload = {id: user.attributes.id};
+        //         var token = jwt.sign(payload, secret_key, { expiresIn: 60 * 60 });
 
-                User.forge(payload).save({jwt_token:token, loginTime:new Date()},{patch:true}).then(function(t_data){
-                    res.json({message: "Token Saved", token: t_data});
-                }).catch(function(err){
-                    res.json({message:'Error saving token ',err});
-                });
-            }
-        });
+        //         User.forge(payload).save({jwt_token:token, loginTime:new Date()},{patch:true}).then(function(t_data){
+        //             res.json({message: "User successfully login", token: t_data});
+        //         }).catch(function(err){
+        //             res.json({message:'Error saving token ',err});
+        //         });
+        //     }
+        // });
+        if(password == user.attributes.password){
+            var payload = {id: user.attributes.id};
+            var token = jwt.sign(payload, secret_key, { expiresIn: 60 * 60 });
+
+            User.forge(payload).save({jwt_token:token, loginTime:new Date()},{patch:true}).then(function(t_data){
+                res.json({message: "User successfully login", token: t_data});
+            }).catch(function(err){
+                res.json({message:'Error saving token ',err});
+            });
+        }
+        else{
+            res.status(401).json({message:"Incorrect Password!"});
+        }
     }).catch(function(err){
         return err;
     });
@@ -120,13 +135,6 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
-
-// router.get('/auth/google/callback', 
-//   passport.authenticate('google', {failureRedirect: '#/login'}),
-//   function(req, res) {
-//     res.redirect('http://localhost:3000/#/');
-// });
-
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile','email'] }));
   
 router.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
@@ -139,7 +147,6 @@ router.get('/auth/google/callback', passport.authenticate('google'), (req, res) 
 router.get("/secret", passport.authenticate('jwt', { session: false }), function(req, res){
     res.json({"msg":"Success! You can not see this without a token",user:req.user});
 });
-
 
 router.post("/adduser", passport.authenticate('jwt', { session: false }), addUserData);
 router.post("/edituser/:id", passport.authenticate('jwt', { session: false }), editUserData);
@@ -165,7 +172,7 @@ function addUserData(req,res){
 
         User.forge({email:req.body.email}).fetch().then(function(rows){
             if (rows) {
-                return res.send("User already exist in the database!");
+                return res.send({status:"not ok", message:"User already registered!"});
             } else {
                 // if there is no user with that email then add the user
                 
@@ -188,18 +195,12 @@ function addUserData(req,res){
                         user   : data,
                         status: 'ok'
                     });
-                }).catch(function(err){
-                    return res.status(400).json({
-                        message: err
-                    });
-                }); 
+                });
             }   
-        }).catch(function(err){
-            res.send(err);
         });
     }
     else{
-        res.json({message: 'User is unauthorized!'});
+        res.json({status: 'not ok', message: 'User is unauthorized!'});
     }
 }
 
@@ -212,10 +213,10 @@ function editUserData(req,res){
         var id = req.params.id;
 
         var user_data = new Object();
-        user_data.email    = req.body.email;
-        user_data.username    = req.body.username;
-        user_data.firstName    = req.body.firstName;
-        user_data.lastName    = req.body.lastName;
+        user_data.email = req.body.email;
+        user_data.username = req.body.username;
+        user_data.firstName = req.body.firstName;
+        user_data.lastName = req.body.lastName;
         user_data.created_at = new Date();
 
         User.forge({id:id}).fetch().then(function(user){
@@ -226,27 +227,18 @@ function editUserData(req,res){
                         user   : data,
                         status: 'ok'
                     });
-                }).catch(function(error){
-                    return res.status(400).json({
-                        message: error
-                    });
                 });
             }
             else{
-                return res.status(400).json({
+                return res.json({
                     message: 'No user found with this id!',
                     user   : null
                 });
             }
-        }).catch(function(err) { 
-            res.status(404).json({
-                status: 'not ok',
-                message: err
-            });
         });
     }
     else{
-        res.json({message: 'User is unauthorized!'});
+        res.json({status: 'not ok', message: 'User is unauthorized!'});
     }
 }
 
@@ -261,16 +253,12 @@ function deleteUserData(req,res){
         User.forge({id:id}).fetch().then(function(u_data){
             if(u_data){
                 u_data.destroy().then(function(){
-                    res.json({status: 'ok', message:'Record successfully deleted!'});
-                }).catch(function(err){
-                    res.json({message:'Error deleting record!'});
+                    res.json({status: 'ok', message:'Data successfully deleted!'});
                 });
             }
             else{
-                res.json({message:'User id not found!'});
+                res.json({status:'not ok', message:'User id not found!'});
             }
-        }).catch(function(er){
-            res.json({status: 'not ok', message: 'error finding users ',er});
         });
     }
     else{
@@ -286,8 +274,6 @@ function getAllUsers(req,res){
     if(token == u_token){
         User.fetchAll().then(function(u_data){
             res.json({status: 'ok',user:u_data});
-        }).catch(function(er){
-            res.json({status: 'not ok', message: 'error finding users ',er});
         });
     }
     else{
@@ -309,8 +295,6 @@ function getUserById(req,res){
             else{
                 res.json({message:'User id not found!'});
             }
-        }).catch(function(er){
-            res.json({status: 'not ok', message: 'error finding users ',er});
         });
     }
     else{

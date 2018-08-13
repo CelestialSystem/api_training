@@ -7,11 +7,11 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 var jwtOptions = new Object();
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = 'my_secret';
-
+console.log(jwtOptions.jwtFromRequest);
 // authentication using jwt strategy
 
 passport.use(new JwtStrategy(jwtOptions,function(jwt_payload,done) {
-    console.log(jwt_payload);
+    // console.log(jwt_payload);
     User.forge({id: jwt_payload.id}).fetch().then(function(user) {
         if(!user){
             return done(null,false,{message:"Incorrect email!"});
@@ -58,12 +58,8 @@ passport.use(new GoogleStrategy({
                 
                 User.forge({email:profile.emails[0].value}).fetch().then(function(u_data){
                     if(u_data){
-                        User.forge({id:u_data.id}).save(newUser, 
-                        {patch: true}).then(function(data){
-    
+                        User.forge({id:u_data.id}).save(newUser,{patch: true}).then(function(data){
                             return done(null, data); 
-                        }).catch(function(er){
-                            return done(er);
                         });
                     }
                     else{
@@ -72,12 +68,8 @@ passport.use(new GoogleStrategy({
                         User.forge(newUser).save().then(function(u_data) {
                         // if successful, return the new user
                             return done(null, u_data);
-                        }).catch(function(error){
-                            return done(error);
                         });
                     }
-                }).catch(function(err){
-                    return done(err);
                 });
             }
             // return done(err, user);
