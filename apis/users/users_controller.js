@@ -51,15 +51,18 @@ router.post('/register', function(req, res) {
                     };
                     transporter.sendMail(mailOptions, function(error, info){
                         if (error) {
-                          console.log(error);
+                            res.json({
+                                message: 'Something wrong with the email ids',
+                                status: 'not ok'
+                            });
                         } else {
-                          console.log('Email sent: ' + info.response);
+                            res.json({
+                                message: 'Email Sent',
+                                status: 'ok',
+                                user: data,
+                                info: info.response
+                            });
                         }
-                    });
-                    return res.status(200).json({
-                        message: 'User registered successfully!',
-                        user   : data,
-                        status: 'ok'
                     });
                 }).catch(function(err){
                     return res.status(400).json({
@@ -87,23 +90,6 @@ router.post("/login", function(req, res) {
         if(!user){
             res.status(401).json({message:"Incorrect email!"});
         }
-        // bcrypt.compare(password,user.attributes.password,function(error,result){
-        //     console.log(result);
-        //     if(result==false){
-        //         console.log('m here');
-        //         res.status(401).json({message:"password did not match "});
-        //     }
-        //     else{
-        //         var payload = {id: user.attributes.id};
-        //         var token = jwt.sign(payload, secret_key, { expiresIn: 60 * 60 });
-
-        //         User.forge(payload).save({jwt_token:token, loginTime:new Date()},{patch:true}).then(function(t_data){
-        //             res.json({message: "User successfully login", token: t_data});
-        //         }).catch(function(err){
-        //             res.json({message:'Error saving token ',err});
-        //         });
-        //     }
-        // });
         if(password == user.attributes.password){
             var payload = {id: user.attributes.id};
             var token = jwt.sign(payload, secret_key, { expiresIn: 60 * 60 });
@@ -172,7 +158,7 @@ function addUserData(req,res){
 
         User.forge({email:req.body.email}).fetch().then(function(rows){
             if (rows) {
-                return res.send({status:"not ok", message:"User already registered!"});
+                return res.json({status:"not ok", message:"Email id already exist"});
             } else {
                 // if there is no user with that email then add the user
                 
@@ -180,20 +166,23 @@ function addUserData(req,res){
                     var mailOptions = {
                         from: 'shivanitest14@gmail.com',
                         to: 'sharma.14shivani@gmail.com',
-                        subject: 'User Password',
-                        text: 'Your email id is : '+user_data.email+ ' Your Password is : '+user_data.password
+                        subject: 'User Password Mail',
+                        text: 'Your email id is : '+data.email+ ' Your Password is : '+data.password
                     };
                     transporter.sendMail(mailOptions, function(error, info){
                         if (error) {
-                          console.log(error);
+                            res.json({
+                                message: 'Something wrong with the email ids',
+                                status: 'not ok'
+                            });
                         } else {
-                          console.log('Email sent: ' + info.response);
+                            res.json({
+                                message: 'Email Sent',
+                                status: 'ok',
+                                user: data,
+                                info: info.response
+                            });
                         }
-                    });
-                    return res.status(200).json({
-                        message: 'User added successfully!',
-                        user   : data,
-                        status: 'ok'
                     });
                 });
             }   

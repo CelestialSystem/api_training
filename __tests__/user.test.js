@@ -1,10 +1,30 @@
 const request = require('supertest');
 const app = require('../server.js');
-// import * as API from '../apis/users/users_controller.js';
+var generator = require('generate-password');
+
+let token;
+let user_id;
+
+let add_user = new Object();
+add_user.email = 'nick@gmail.com';
+add_user.username = 'Nick';
+add_user.firstName = 'nick';
+add_user.lastName = 'Sharma';
+add_user.password = generator.generate({
+  length: 10,
+  numbers: true
+});
+
+let edit_user = new Object();
+edit_user.email = 'aaw@gmail.com';
+edit_user.username = 'aaw';
+edit_user.firstName = 'aaw';
+edit_user.lastName = 'Sharma';
+
 
 describe('Test /test', () => {
   test('It should response the GET method', async () => {
-      await request(app).get('/').expect(200).then(() => {
+      await request(app).get('/').expect(200).then((res) => {
         // const  message = res.text;
         // expect(typeof message).toBe('string');
         // expect(message).toBe('Hello World!');
@@ -13,22 +33,22 @@ describe('Test /test', () => {
   });
 });
 
-describe('Test users api', () => {
-  let token;
 
+describe('Test User Registration api', () => {
   test('Registering users work as expected', async () => {
-    let user = {email:'hi@gmail.com', username: 'Hi'};
-    await request(app).post('/user/register')
-    .send(user).then(function(res){
-      console.log(res.body.user);
+    let user = {email:'john@gmail.com', username: 'John'};
+    await request(app).post('/user/register').send(user).then(function(res){
       expect(res.body.status).toBe('ok');
       expect({success:true});
       expect(typeof res.body.user.username).toBe('string');
     });
   });
-  
-  test('test user login api', async () => {
-    let user = {email:'hello.sharma@celestialsys.com', password: 'BEUBPGTLOK'};
+});
+
+
+describe('Test User login api', () => {
+  test('test login response after providing correct email and password', async () => {
+    let user = {email:'s.sharma@celestialsys.com', password: 'k2WN14fUPU'};
     await request(app).post('/user/login').send(user).expect(200).then(function(res){
         token = 'Bearer ' +res.body.token.jwt_token;
         expect(typeof user.email).toBe('string');
@@ -47,23 +67,72 @@ describe('Test users api', () => {
   });
 
   test('incorrect password', async () => {
-    let user = {email:'hello.sharma@celestialsys.com', password: 'dsfas'};
+    let user = {email:'s.sharma@celestialsys.com', password: 'dsfas'};
     await request(app).post('/user/login').send(user).expect(401).then(function(res){
         expect(typeof user.email).toBe('string');
         expect(typeof user.password).toBe('string');
         expect(res.body.message).toBe('Incorrect Password!');
     });
   });
+});
+  
 
-  test('user is unauthorized due to not passing bearer token in headers', async() =>{
-    await request(app).get('/user/getuser').expect(401).then((res) => {
-      
+describe('Test add user api', () => {
+  test('testing add user api where user is unauthorized due to not passing bearer token in headers', async() =>{
+    await request(app).post('/user/adduser').expect(401).then((res) => {
+      expect(res.body.status).not.toBe('ok');
     });
   });
 
-  test('user is unauthorized due to not passing bearer token in headers', async() =>{
-    await request(app).get('/user/getUserById/5').expect(401).then((res) => {
-      
+  test('should insert the user data in the database', async() => {
+    await request(app).post('/user/adduser').set('Authorization', token).send(add_user).expect(200).then((res) => {
+      user_id = res.body.user.id;
+      expect(res.body.status).toBe('ok');
+    });
+  });
+
+  test('cannot insert data due to same email id existing in the database', async() => {
+    await request(app).post('/user/adduser').set('Authorization', token).send(add_user).expect(200).then((res) => {
+      expect(res.body.status).not.toBe('ok');
+      expect(res.body.message).toBe('Email id already exist');
+    });
+  });
+
+  // test('sending password mail', async() => {
+  //   await request(app).post('/user/adduser').set('Authorization', token).send(add_user).expect(200).then((res) => {
+  //     user_id = res.body.user.id;
+  //     expect(res.body.status).toBe('ok');
+  //     expect(res.body.message).toBe('User added successfully!');
+  //   });
+  // });
+});
+
+
+describe('Test edit user api', () => {
+  test('testing edit user api where user is unauthorized due to not passing bearer token in headers', async() =>{
+    await request(app).post('/user/edituser/20').expect(401).then((res) => {
+      expect(res.body.status).not.toBe('ok');
+    });
+  });
+
+  test('edit user data', async () => {
+    await request(app).post('/user/edituser/'+user_id).set('Authorization', token).send(edit_user).expect(200).then((res) => {
+      expect(res.body.status).toBe('ok');
+    });
+  });
+
+  test('user id not found for editing user data', async () => {
+    await request(app).post('/user/edituser/40').set('Authorization', token).send(edit_user).expect(200).then((res) => {
+      expect(res.body.status).not.toBe('ok');
+    });
+  });
+});
+
+
+describe('Test get user data api', () => {
+  test('testing get user api where user is unauthorized due to not passing bearer token in headers', async() =>{
+    await request(app).get('/user/getuser').expect(401).then((res) => {
+      expect(res.body.status).not.toBe('ok');
     });
   });
 
@@ -72,11 +141,13 @@ describe('Test users api', () => {
       expect(res.body.status).toBe('ok');
     });
   });
+});
 
-  test('should not return all the users due to token mismatch', async() =>{
-    await request(app).get('/user/getuser').set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTM0MTYwMTYzLCJleHAiOjE1MzQxNjM3NjN9.sMEix0mvF9s0Wag2sDfYLM4tP6u_YaaDkLtIeYyW4ww').expect(200).then((res) => {
+
+describe('Test get user data by id api', () => {
+  test('testing get user by id api where user is unauthorized due to not passing bearer token in headers', async() =>{
+    await request(app).get('/user/getUserById/5').expect(401).then((res) => {
       expect(res.body.status).not.toBe('ok');
-      expect(res.body.message).toBe('User is unauthorized!');
     });
   });
 
@@ -86,57 +157,19 @@ describe('Test users api', () => {
     });
   });
 
-  test('should not return user by id due to token mismatch', async() =>{
-    await request(app).get('/user/getUserById/5').set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTM0MTYwMTYzLCJleHAiOjE1MzQxNjM3NjN9.sMEix0mvF9s0Wag2sDfYLM4tP6u_YaaDkLtIeYyW4ww').expect(200).then((res) => {
-      expect(res.body.status).not.toBe('ok');
-      expect(res.body.message).toBe('User is unauthorized!');
-    });
-  });
-
   test('user id not found', async () =>{
-    await request(app).get('/user/getUserById/35').set('Authorization', token).expect(200).then((res) => {
+    await request(app).get('/user/getUserById/40').set('Authorization', token).expect(200).then((res) => {
       expect(res.body.message).toBe('User id not found!');
     });
   });
+});
 
- 
-  let user_data = new Object();
-        user_data.email = 'new1@gmail.com';
-        user_data.username = 'New1';
-        user_data.firstName = 'New1';
-        user_data.lastName = 'Test1';
-        user_data.created_at = new Date();
 
-  test('edit user data', async () =>{
-    await request(app).post('/user/edituser/20').set('Authorization', token).send(user_data).expect(200).then((res) => {
-      expect(res.body.status).toBe('ok');
-    });
-  });
-
-  test('not editing user data due to token mismatch', async () =>{
-    await request(app).post('/user/edituser/20').set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTM0MTYwMTYzLCJleHAiOjE1MzQxNjM3NjN9.sMEix0mvF9s0Wag2sDfYLM4tP6u_YaaDkLtIeYyW4ww').send(user_data).expect(200).then((res) => {
-      expect(res.body.status).not.toBe('ok');
-      expect(res.body.message).toBe('User is unauthorized!');
-    });
-  });
-
-  test('user id not found for editing user data', async () =>{
-    await request(app).post('/user/edituser/33').set('Authorization', token).send(user_data).expect(200).then((res) => {
-      expect(res.body.status).not.toBe('ok');
-    });
-  });
-
+describe('Test delete user api', () => {
   test('delete user data', async () =>{
-    await request(app).get('/user/deleteuser/31').set('Authorization', token).expect(200).then((res) => {
+    await request(app).get('/user/deleteuser/'+user_id).set('Authorization', token).expect(200).then((res) => {
       expect(res.body.status).toBe('ok');
       expect(res.body.message).toBe('Data successfully deleted!');
-    });
-  });
-
-  test('not deleting user data due to token mismatch', async () =>{
-    await request(app).get('/user/deleteuser/20').set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTM0MTYwMTYzLCJleHAiOjE1MzQxNjM3NjN9.sMEix0mvF9s0Wag2sDfYLM4tP6u_YaaDkLtIeYyW4ww').expect(200).then((res) => {
-      expect(res.body.status).not.toBe('ok');
-      expect(res.body.message).toBe('User is unauthorized!');
     });
   });
 
@@ -145,5 +178,13 @@ describe('Test users api', () => {
       expect(res.body.status).not.toBe('ok');
     });
   });
-
 });
+
+
+// describe('Test google strategy', () => {
+//   test('token is correct', async () =>{
+//     await request(app).get('/user/auth/google',passport.authenticate('google', { scope: ['profile','email'] })).expect(200).then((res) => {
+//       expect(res.body.status).not.toBe('ok');
+//     });
+//   });
+// });

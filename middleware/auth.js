@@ -7,11 +7,10 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 var jwtOptions = new Object();
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = 'my_secret';
-console.log(jwtOptions.jwtFromRequest);
+
 // authentication using jwt strategy
 
 passport.use(new JwtStrategy(jwtOptions,function(jwt_payload,done) {
-    // console.log(jwt_payload);
     User.forge({id: jwt_payload.id}).fetch().then(function(user) {
         if(!user){
             return done(null,false,{message:"Incorrect email!"});
@@ -56,27 +55,26 @@ passport.use(new GoogleStrategy({
                 newUser.username = profile.displayName;
                 newUser.loginTime = new Date();
                 
-                User.forge({email:profile.emails[0].value}).fetch().then(function(u_data){
+                User.forge({email:newUser.email}).fetch().then(function(u_data){
                     if(u_data){
-                        User.forge({id:u_data.id}).save(newUser,{patch: true}).then(function(data){
+                        User.forge({id:u_data.id}).save(newUser,{patch:true}).then(function(data){
                             return done(null, data); 
                         });
                     }
                     else{
                         // if there is no user found with that google id, create them
-
                         User.forge(newUser).save().then(function(u_data) {
+
                         // if successful, return the new user
                             return done(null, u_data);
                         });
                     }
                 });
             }
-            // return done(err, user);
        }).catch(function(err){
             return done(err);
        });
-  }
+    }
 ));
 
 module.exports = jwtOptions.secretOrKey;
