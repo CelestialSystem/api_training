@@ -1,0 +1,6 @@
+# Server
+/node_modules
+/coverage
+npm-debug.log
+logs
+package-lock.json
