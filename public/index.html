@@ -1,0 +1,93 @@
+<div>
+    <label>Username:</label>
+    <input id="user_name" type="text" name="User name" />
+</div>
+<div>
+    <label>Email:</label>
+    <input id="email" type="email" name="email" />
+</div>
+<div>
+    <label>Password:</label>
+    <input id="password" type="password" name="password" />
+</div>
+<div>
+    <label>id:</label>
+    <input id="id" type="number" name="id" />
+</div>
+<div>
+    <input type="button" value="Add User" onclick="addUser()" />
+</div>
+<div>
+    <input type="button" value="Edit User" onclick="editUser()" />
+</div>
+<div>
+    <input type="button" value="Delete User By Id " onclick="deleteUserById()" />
+</div>
+<div>
+    <input type="button" value="Delete User By Email" onclick="deleteUserByMail()" />
+</div>
+<script>
+    let serverOrigin = 'http://localhost:8082';
+    let getUser = [];
+    (function () {
+        sendRequest(serverOrigin + '/user/', 'get').then(res => {
+            getUser = res.result;
+        }).catch(err => {
+            console.log("error occured: ",err)
+        });
+    })();
+    function addUser() {
+        let name = document.getElementById('user_name').value;
+        let email = document.getElementById('email').value;
+        let password = document.getElementById('password').value;
+        let user_id = document.getElementById('id').value;
+        sendRequest(serverOrigin + '/user/createUsers', 'post', { id:user_id, name: name, email: email, password: password })
+    }
+    function editUser() {
+        let name = document.getElementById('user_name').value;
+        let email = document.getElementById('email').value;
+        let password = document.getElementById('password').value;
+        let id_user = document.getElementById('id').value;
+        sendRequest(serverOrigin + '/user/updateUsers/'+email, 'put', { id: id_user, name: name, email: email, password: password })
+    }
+    function deleteUserById() {
+        let id_user = document.getElementById('id').value;
+        console.log("id",id_user)
+        sendRequest(serverOrigin + '/user/deleteUserById/'+id_user, 'delete')
+    }
+    function deleteUserByMail() {
+        let email = document.getElementById('email').value;
+        sendRequest(serverOrigin + '/user/deleteUserByMail/'+email, 'delete')
+    }
+    function sendRequest(path, method, data) {
+        let requestObj = {
+            method: method,
+            headers: {
+                'Accept': 'application/json',
+                "Content-type": "application/json"
+            }
+        };
+
+        if (method == 'post'||(method == 'put')) {
+            requestObj['body'] = data ? JSON.stringify(data) : ''
+        }
+
+        return fetch(path, requestObj)
+            .then(
+                function (response) {
+                    if (response.status !== 200) {
+                        console.log('Problem. Status Code: ' +
+                            response.status);
+                        return { result: [], status: response.status, message: 'Some error occured!' };
+                    }
+                    response.json().then(function (data) {
+                        console.log(data);
+                        return { result: [data], status: response.status, message: 'Successfull request!' };
+                    });
+                }
+            )
+            .catch(function (err) {
+                console.log('Error :', err);
+            });
+    }
+</script>

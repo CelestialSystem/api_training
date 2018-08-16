@@ -1,0 +1,6 @@
+#nodemodules
+
+/server/node_modules/
+
+#package lock json
+/server/package-lock
