@@ -64,11 +64,11 @@ module.exports = (passport, passportJwt, jwtSimple, bCrypt, GoogleStrategy, data
                         return success({ token: null, error: new Error("User not found") });
                     } else {
                         // let hashPass = bCrypt.hashSync(user.password, bCrypt.genSaltSync(10), null)
-                        // console.log("hashpass: ",hashpass)
+                        // console.log("hashpass: ",hashpass)                       
                         if (!bCrypt.compareSync(user.password, data.password)) {
+                            if(user.password!==data.password)
                             return success({ token: null, error: new Error("User not found") });
-                        }
-                        let payload = {
+                        } let payload = {
                             id: data.id
                         }
                         let token = jwtSimple.encode(payload, cfg.jwtSecret);

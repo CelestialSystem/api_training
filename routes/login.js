@@ -7,7 +7,7 @@ module.exports = function (router, auth) {
                 password: req.body.password
             }
             auth.token_generation(user).then(result => {
-
+console.log("result: ",result)
                 if (result.error && !result.token) {
                     const error = result.error;
                     error.status = 401;

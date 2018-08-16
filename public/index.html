@@ -40,7 +40,8 @@
         let name = document.getElementById('user_name').value;
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
-        sendRequest(serverOrigin + '/user/createUsers', 'post', { name: name, email: email, password: password })
+        let user_id = document.getElementById('id').value;
+        sendRequest(serverOrigin + '/user/createUsers', 'post', { id:user_id, name: name, email: email, password: password })
     }
     function editUser() {
         let name = document.getElementById('user_name').value;

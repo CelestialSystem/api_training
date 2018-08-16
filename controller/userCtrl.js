@@ -6,18 +6,14 @@ module.exports = function (knex) {
                 return next(data, null);
             }).catch(err => {
                 return next('', err);
-            }).finally(function () {
-                knex.knex.destroy();
-            });
+            })
         },
         getUserById: function (id, next) {
-            knex.knex('user_data').where({ id: id }).first().then((res) => {
+            knex.knex.table('user_data').where({ id: id }).first().then((res) => {
                 next(res.user_name, null)
             }).catch((err) => {
                 console.log("returned err ", err)
                 next("", err)
-            }).finally(function () {
-                knex.knex.destroy();
             })
         },
         getUserByMail: function (email, next) {
@@ -26,8 +22,6 @@ module.exports = function (knex) {
             }).catch((err) => {
                 console.log("returned err ", err)
                 next("", err)
-            }).finally(function () {
-                knex.knex.destroy();
             })
         },
         insertUser: function (user_data, next) {
@@ -63,8 +57,6 @@ module.exports = function (knex) {
                 }).catch((err) => {
                     console.log("returned err ", err)
                     next("", err)
-                }).finally(function () {
-                    knex.knex.destroy();
                 })
         },
         deleteUserById: function (user_data, next) {
@@ -75,8 +67,6 @@ module.exports = function (knex) {
                 }).catch((err) => {
                     console.log("returned err ", err)
                     next("", err)
-                }).finally(function () {
-                    knex.knex.destroy();
                 })
         },
         insertGoogleUser: function (user_data, token, next) {

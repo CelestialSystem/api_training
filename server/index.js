@@ -54,3 +54,4 @@ app.use('/auth', login(server.routes, auth))
 app.use('/auth/signup', register(server.routes, passGenerator, nodeMailer, dataConfig))
 app.use('/user', user(server.routes, dataConfig))
 // app.use('/logout',require('../routes/logout.js'))
+module.exports = app;

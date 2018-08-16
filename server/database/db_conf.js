@@ -6,6 +6,10 @@ module.exports.development = {
         password: 'admin',
         database: 'tradein_development'
     },
+    pool: {
+      min: 2,
+      max: 20
+    },
     migrations: {
         directory: __dirname+'/migrations'
     },

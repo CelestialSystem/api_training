@@ -9,7 +9,7 @@ module.exports = function (router, dataConfig) {
     });
     
     router.route('/getUsers/:email').get(function (req, res, next) {
-        let req_body = req.body;
+        let req_body = req.params.email;
         dataConfig.getUserByMail(req_body, function (result, err) {
             if (err) {
                 return next(err);
@@ -18,7 +18,7 @@ module.exports = function (router, dataConfig) {
         })
     });
     router.route('/getUsers/:id').get(function (req, res, next) {
-        let req_body = req.body;
+        let req_body = req.params.id;
         dataConfig.getUserById(req_body, function (result, err) {
             if (err) {
                 return next(err);
