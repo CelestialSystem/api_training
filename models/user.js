@@ -1,4 +1,4 @@
-var knexobj = require('../../knexfile');
+var knexobj = require('../../config/database');
 var knex = require('knex')(knexobj.development);
 var bookshelf = require('bookshelf')(knex);
 

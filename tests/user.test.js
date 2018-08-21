@@ -25,10 +25,7 @@ edit_user.lastName = 'Sharma';
 describe('Test /test', () => {
   test('It should response the GET method', async () => {
       await request(app).get('/').expect(200).then((res) => {
-        // const  message = res.text;
-        // expect(typeof message).toBe('string');
-        // expect(message).toBe('Hello World!');
-        // expect(success).toBeTruthy();
+
       });
   });
 });
@@ -97,14 +94,6 @@ describe('Test add user api', () => {
       expect(res.body.message).toBe('Email id already exist');
     });
   });
-
-  // test('sending password mail', async() => {
-  //   await request(app).post('/user/adduser').set('Authorization', token).send(add_user).expect(200).then((res) => {
-  //     user_id = res.body.user.id;
-  //     expect(res.body.status).toBe('ok');
-  //     expect(res.body.message).toBe('User added successfully!');
-  //   });
-  // });
 });
 
 
@@ -179,12 +168,3 @@ describe('Test delete user api', () => {
     });
   });
 });
-
-
-// describe('Test google strategy', () => {
-//   test('token is correct', async () =>{
-//     await request(app).get('/user/auth/google',passport.authenticate('google', { scope: ['profile','email'] })).expect(200).then((res) => {
-//       expect(res.body.status).not.toBe('ok');
-//     });
-//   });
-// });

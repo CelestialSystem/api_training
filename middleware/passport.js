@@ -1,4 +1,4 @@
-const User = require('../apis/users/user.js');
+const User = require('../models/user.js');
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy,
 ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -11,15 +11,15 @@ jwtOptions.secretOrKey = 'my_secret';
 // authentication using jwt strategy
 
 passport.use(new JwtStrategy(jwtOptions,function(jwt_payload,done) {
+    console.log(jwt_payload);
+
     User.forge({id: jwt_payload.id}).fetch().then(function(user) {
         if(!user){
             return done(null,false,{message:"Incorrect email!"});
         }
-        return done(null, user.attributes, {
-            message: 'Logged In Successfully'
-        });
+        user.get('random_jwt') == jwt_payload.random_jwt ? done(null, user): done(null, false);
     }).catch(function(err){
-        return done(err);
+        return done(err,false);
     });
 }));
 

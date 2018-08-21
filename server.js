@@ -17,7 +17,7 @@ app.use(function(req, res, next) {
 app.use(passport.initialize());
 app.use(passport.session());
 
-const userController = require('./apis/users/users_controller.js');
+const userController = require('./controllers/users_controller.js');
 
 app.use('/user', userController);
 
