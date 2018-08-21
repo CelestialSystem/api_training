@@ -1,0 +1,7 @@
+# Server
+/node_modules
+/coverage
+/.vscode
+npm-debug.log
+logs
+package-lock.json
